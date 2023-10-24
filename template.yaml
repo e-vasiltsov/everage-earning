@@ -1,0 +1,53 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  earnings-exchanger
+
+  SAM Template for earnings-exchanger
+
+Parameters:
+  AlphavantageApiKey:
+    Type: String
+    Description: Alphavantage API key
+    NoEcho: true
+
+Resources:
+  EarningsExchangerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: earnings-exchanger/
+      Handler: app.lambdaHandler
+      Runtime: nodejs18.x
+      MemorySize: 256
+      Timeout: 20
+      Architectures:
+        - x86_64
+      Events:
+        AverageEarning:
+          Type: Api
+          Properties:
+            Path: /averageEarning
+            Method: get
+      Environment:
+        Variables:
+          ALPHAVANTAGE_API_URL: "https://www.alphavantage.co"
+          ALPHAVANTAGE_API_KEY: !Ref AlphavantageApiKey
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints:
+          - app.ts
+
+Outputs:
+  EarningsExchangerApi:
+    Description: "API Gateway endpoint URL for Prod stage for Earnings Exchanger function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/averageEarning/"
+  EarningsExchangerFunction:
+    Description: "Earnings Exchanger Lambda Function ARN"
+    Value: !GetAtt EarningsExchangerFunction.Arn
+  EarningsExchangerFunctionIamRole:
+    Description: "Implicit IAM Role created for Earnings Exchanger function"
+    Value: !GetAtt EarningsExchangerFunctionRole.Arn
