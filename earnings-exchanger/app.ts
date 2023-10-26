@@ -16,7 +16,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
             await getAverageEarningSchema.validate(queryStringParameters)
         );
 
-        const currencies: string[] = cur.split(',');
+        const currencies: Currency[] = cur.split(',');
 
         const averageEarning = await stockMarketAPI.calculateAverageEarnings(currencies, targetCur);
 

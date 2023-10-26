@@ -1,11 +1,12 @@
+import { Currency } from './interfaces/currency.type';
 import { AlphAvantageProvider } from './providers/alphavantage/alphavantage.provider';
 
 const stockmarketApi = new AlphAvantageProvider();
 
 export const calculateAverageEarnings = async (
-    setOfCurrencies: string[],
-    targetCurrency: string,
-): Promise<{ average: number; currency: string }> => {
+    setOfCurrencies: Currency[],
+    targetCurrency: Currency,
+): Promise<{ average: number; currency: Currency }> => {
     const earnings = await stockmarketApi.fetchEarnings();
 
     earnings.filterInvalidDataAndCurrencies(setOfCurrencies).groupByCompanyByLatestRecord();

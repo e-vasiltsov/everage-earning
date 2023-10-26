@@ -1,12 +1,14 @@
+import { Currency } from "./interfaces/currency.type";
+
 export class Currencies {
-    constructor(private arrayCurrencies: string[]) {}
+    constructor(private arrayCurrencies: Currency[]) {}
 
     unique() {
         this.arrayCurrencies = [...new Set(this.arrayCurrencies)];
         return this;
     }
 
-    values() {
+    values(): Currency[] {
         return this.arrayCurrencies;
     }
 }
