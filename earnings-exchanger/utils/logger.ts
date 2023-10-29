@@ -1,4 +1,5 @@
 import pino from 'pino';
+import { getEnvVariable } from './config';
 
 interface ILogger {
     info(message: string, data?: any): void;
@@ -27,4 +28,7 @@ class LoggerService {
     }
 }
 
-export const Logger = new LoggerService(pino({ level: 'debug' }));
+const SHOULD_LOG_DEBUG = getEnvVariable("SHOULD_LOG_DEBUG") === 'true' ? true : false
+const pinoOptions = SHOULD_LOG_DEBUG ? { level: 'debug' } : {}
+
+export const Logger = new LoggerService(pino(pinoOptions));
