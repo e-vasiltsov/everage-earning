@@ -21,30 +21,33 @@ const API_KEY = getEnvVariable('ALPHAVANTAGE_API_KEY');
 
 export class AlphAvantageProvider {
     async fetchEarnings(): Promise<EarningsData> {
+        let response;
+
         try {
             Logger.debug('AlphAvantageProvider.fetchEarnings:start');
-            const response = await httpClient.get(
+            response = await httpClient.get(
                 `${API_URL}/query?function=EARNINGS_CALENDAR&horizon=3month&apikey=${API_KEY}`,
                 { responseType: 'stream' },
             );
-
-            if (response.statusCode !== 200) {
-                Logger.error('AlphAvantageProvider.response', response);
-                throw new AVFetchErningsError('Error fetching earnings data');
-            }
-
-            const csvStream: IncomingMessage = response.data;
-
-            Logger.debug('AlphAvantageProvider.fetchEarnings:fetched');
-
-            const earnings = await this.parseCSV(csvStream);
-
-            Logger.debug('AlphAvantageProvider.fetchEarnings:finished');
-
-            return new EarningsData(earnings);
         } catch (error) {
-            throw new AVFetchErningsError('AlphAvantageProvider.fetchEarnings', error as Error);
+            throw new AVFetchErningsError('Error fetching earnings data', error as Error);
         }
+
+        if (response.statusCode !== 200) {
+            Logger.error('AlphAvantageProvider.response', response);
+            throw new AVFetchErningsError('AlphAvantageProvider.fetchEarnings:status');
+        }
+
+        const csvStream: IncomingMessage = response.data;
+
+        Logger.debug('AlphAvantageProvider.fetchEarnings:fetched');
+
+        const earnings = await this.parseCSV(csvStream);
+
+        Logger.debug('AlphAvantageProvider.fetchEarnings:finished');
+
+        return new EarningsData(earnings);
+      
     }
 
     async getExchangeRate(fromCurrency: Currency, toCurrency: Currency): Promise<number> {
