@@ -2,7 +2,7 @@ import { calculateAverageEarnings } from '../../../../services/stock-market/';
 import { AlphAvantageProvider } from '../../../../services/stock-market/providers/alphavantage/alphavantage.provider';
 import { EarningsData } from '../../../../services/stock-market/providers/alphavantage/earnings-data';
 
-jest.mock('../../../../services/stock-market/providers/alphavantage/alphavantage.service');
+jest.mock('../../../../services/stock-market/providers/alphavantage/alphavantage.provider');
 
 describe('calculateAverageEarnings', () => {
     beforeEach(() => {
