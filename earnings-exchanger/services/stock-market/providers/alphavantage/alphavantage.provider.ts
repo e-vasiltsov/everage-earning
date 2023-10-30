@@ -25,10 +25,13 @@ export class AlphAvantageProvider {
 
         try {
             Logger.debug('AlphAvantageProvider.fetchEarnings:start');
+
             response = await httpClient.get(
                 `${API_URL}/query?function=EARNINGS_CALENDAR&horizon=3month&apikey=${API_KEY}`,
                 { responseType: 'stream' },
             );
+
+            Logger.debug('AlphAvantageProvider.fetchEarnings:fetched', {response});
         } catch (error) {
             throw new AVFetchErningsError('Error fetching earnings data', error as Error);
         }
@@ -39,8 +42,6 @@ export class AlphAvantageProvider {
         }
 
         const csvStream: IncomingMessage = response.data;
-
-        Logger.debug('AlphAvantageProvider.fetchEarnings:fetched');
 
         const earnings = await this.parseCSV(csvStream);
 
@@ -62,6 +63,8 @@ export class AlphAvantageProvider {
 
         const currencyExchange: CurrencyExchangeResponse = response.data;
 
+        Logger.debug('AlphAvantageProvider.getExchangeRate:fetched', { currencyExchange });
+
         if (
             !currencyExchange ||
             !currencyExchange['Realtime Currency Exchange Rate'] ||
@@ -73,8 +76,6 @@ export class AlphAvantageProvider {
 
         const exchangeRate = parseFloat(currencyExchange['Realtime Currency Exchange Rate']['5. Exchange Rate']);
 
-        Logger.debug('AlphAvantageProvider.getExchangeRate:finished');
-
         return exchangeRate;
     }
 
@@ -82,7 +83,7 @@ export class AlphAvantageProvider {
         currencies: Currency[],
         targetCurrency: Currency,
     ): Promise<CurrenciesExchangeRatesObj> {
-        Logger.debug('AlphAvantageProvider.getCurrenciesExchangeRatesObj:start');
+        Logger.debug('AlphAvantageProvider.getCurrenciesExchangeRatesObj:start', {currencies, targetCurrency});
         // remove target currency
         const filteredCurrency = currencies.filter((currency) => currency !== targetCurrency);
 
@@ -108,7 +109,7 @@ export class AlphAvantageProvider {
         Logger.debug('AlphAvantageProvider.parseCSV:start');
 
         try {
-            return <EarningsRecord[]>await StringStream.from(csvStream)
+            const earnings = <EarningsRecord[]>await StringStream.from(csvStream)
                 .lines()
                 .parse((line) => {
                     const [symbol, name, reportDate, fiscalDateEnding, estimate, currency] = line
@@ -124,6 +125,10 @@ export class AlphAvantageProvider {
                     };
                 })
                 .toArray();
+
+            Logger.debug('AlphAvantageProvider.parseCSV:parsed', { earnings });
+
+            return earnings;
         } catch (error) {
             Logger.error('AlphAvantageProvider.parseCSV:error', error);
             throw new AVCsvParseError('an error while parsing csv string');
