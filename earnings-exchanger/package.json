@@ -3,7 +3,6 @@
     "version": "1.0.0",
     "description": "An AWS Lambda service to calculate average earnings in target currencies using the Alpha Vantage API.",
     "main": "app.js",
-    "repository": "https://github.com/awslabs/aws-sam-cli/tree/develop/samcli/local/init/templates/cookiecutter-aws-sam-hello-nodejs",
     "author": "Yevgen Vasiltsov <eugene.vasiltsov@gmail.com>",
     "license": "MIT",
     "scripts": {
